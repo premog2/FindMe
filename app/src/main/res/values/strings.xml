@@ -1,6 +1,13 @@
 <resources>
     <string name="app_name">FindMe</string>
 
-    <string name="welcome">Welcome to FindMe!</string>
+    <string name="welcome">Welcome to FindMe</string>
+    <string name="findMyFriendButtonText">I want to find my friend</string>
+    <string name="findMyFriendDescription">Enter the code we sent to your friend</string>
+    <string name="friendFindMeButtonText">My friend wants to find me</string>
+    <string name="meetHalfwayButtonText">I want to Meet halfway</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_find__my__friend">Find My Friend</string>
+
+    <string name="hello_world">Hello world!</string>
 </resources>
