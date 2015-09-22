@@ -1,24 +1,22 @@
 package rcos.findme;
 
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
-import android.view.View;
 import android.view.MenuItem;
 
-public class Home extends AppCompatActivity {
+public class Find_My_Friend extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+        setContentView(R.layout.activity_find_my_friend);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_home, menu);
+        getMenuInflater().inflate(R.menu.menu_find_my_friend, menu);
         return true;
     }
 
@@ -35,9 +33,5 @@ public class Home extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public void findMyFriendActivity(View view) {
-        Intent intent = new Intent(this, findMyFriendDialog.class);
     }
 }

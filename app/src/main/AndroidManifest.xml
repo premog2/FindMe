@@ -16,6 +16,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".Find_My_Friend"
+            android:label="@string/title_activity_find__my__friend" >
+        </activity>
     </application>
 
 </manifest>
