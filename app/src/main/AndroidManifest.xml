@@ -18,7 +18,19 @@
         </activity>
         <activity
             android:name=".Find_My_Friend"
-            android:label="@string/title_activity_find__my__friend" >
+            android:label="@string/title_activity_find__my__friend"
+            android:parentActivityName=".Home" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".Home" />
+        </activity>
+        <activity
+            android:name=".Friend_Find_Me"
+            android:label="@string/title_activity_friend__find__me"
+            android:parentActivityName=".Home" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".Home" />
         </activity>
     </application>
 

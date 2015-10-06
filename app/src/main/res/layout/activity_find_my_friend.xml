@@ -1,12 +1,31 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="rcos.findme.Find_My_Friend">
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="16dp"
+    tools:context="rcos.findme.Find_My_Friend"
+    android:orientation="vertical">
 
     <TextView
         style="@style/header"
         android:text="@string/findMyFriendDescription"
         android:textSize="20dp" />
 
-</RelativeLayout>
+    <EditText
+        android:hint="@string/findMyFriendHint"
+        android:layout_margin="25dp"
+        android:layout_width="95dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center"
+        android:inputType="text"
+        android:gravity="center"/>
+
+    <Button
+        style="@style/button"
+        android:text="@string/buttonGo"
+        android:textSize="25dp"
+        android:layout_margin="25dp"
+        android:layout_width="fill_parent"
+        android:layout_height="60dp" />
+
+</LinearLayout>

@@ -2,12 +2,21 @@
     <string name="app_name">FindMe</string>
 
     <string name="welcome">Welcome to FindMe</string>
+
+    <string name="buttonGo">Go</string>
+
     <string name="findMyFriendButtonText">I want to find my friend</string>
     <string name="findMyFriendDescription">Enter the code we sent to your friend</string>
+    <string name="findMyFriendHint">1A2B3C4</string>
+
     <string name="friendFindMeButtonText">My friend wants to find me</string>
+    <string name="friendFindMeDescription">Send this code to your friend</string>
+    <string name="friendFindMePlaceholder">ABC1234</string>
+
     <string name="meetHalfwayButtonText">I want to Meet halfway</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_find__my__friend">Find My Friend</string>
 
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_friend__find__me">Friend Find Me</string>
 </resources>
