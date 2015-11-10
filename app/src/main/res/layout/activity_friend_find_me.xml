@@ -14,11 +14,12 @@
 
     <TextView
         android:text="@string/friendFindMePlaceholder"
+        android:textColor="@color/AppSecondaryColor"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
         android:gravity="center"
-        android:textSize="50dp"/>
+        android:textSize="60dp"/>
 
 
 

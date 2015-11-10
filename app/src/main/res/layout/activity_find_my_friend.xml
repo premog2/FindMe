@@ -12,10 +12,14 @@
         android:textSize="20dp" />
 
     <EditText
+        android:id="@+id/code"
         android:hint="@string/findMyFriendHint"
+        android:textSize="50dp"
+        android:maxLength="7"
+        android:textAllCaps="true"
         android:layout_margin="25dp"
-        android:layout_width="95dp"
-        android:layout_height="50dp"
+        android:layout_width="250dp"
+        android:layout_height="80dp"
         android:layout_gravity="center"
         android:inputType="text"
         android:gravity="center"/>
@@ -24,8 +28,11 @@
         style="@style/button"
         android:text="@string/buttonGo"
         android:textSize="25dp"
-        android:layout_margin="25dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginLeft="25dp"
+        android:layout_marginRight="25dp"
         android:layout_width="fill_parent"
-        android:layout_height="60dp" />
+        android:layout_height="60dp"
+        android:onClick="checkCode"/>
 
 </LinearLayout>
