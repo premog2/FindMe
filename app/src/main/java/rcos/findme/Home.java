@@ -1,6 +1,8 @@
 package rcos.findme;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -9,9 +11,12 @@ import android.view.MenuItem;
 
 public class Home extends AppCompatActivity {
 
+    private PermissionCheck permissionCheck;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        permissionCheck = new PermissionCheck(this);
         setContentView(R.layout.activity_home);
     }
 
@@ -43,7 +48,20 @@ public class Home extends AppCompatActivity {
     }
 
     public void friendFindMeActivity(View view) {
-        Intent intent = new Intent(this, Friend_Find_Me.class);
+        boolean permissionGranted = permissionCheck.CheckLocationPermission();
+
+        if(permissionGranted) {
+            Intent intent = new Intent(this, Friend_Find_Me.class);
+            startActivity(intent);
+        }
+    }
+
+    public void meetHalfwayActivity(View view) {
+        
+    }
+
+    public void findMeMapActivity(View view) {
+        Intent intent = new Intent(this, Find_Me_Map.class);
         startActivity(intent);
     }
 }
