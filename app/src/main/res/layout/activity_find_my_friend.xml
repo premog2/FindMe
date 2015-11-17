@@ -8,8 +8,7 @@
 
     <TextView
         style="@style/header"
-        android:text="@string/findMyFriendDescription"
-        android:textSize="20dp" />
+        android:text="@string/findMyFriendDescription" />
 
     <EditText
         android:id="@+id/code"

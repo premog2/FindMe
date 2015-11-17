@@ -27,7 +27,7 @@ public class PermissionCheck {
                     != PackageManager.PERMISSION_GRANTED) {
 
                 if (ActivityCompat.shouldShowRequestPermissionRationale(activity, android.Manifest.permission.ACCESS_FINE_LOCATION))
-                    showMessageOKCancel("Please allow access to Location for this application to work.", new DialogInterface.OnClickListener() {
+                    showMessageOKCancel("Please grant Location permission for this application to function properly.", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int x) {
                             ActivityCompat.requestPermissions(activity, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE_PERMISSION);
                         }
@@ -41,8 +41,12 @@ public class PermissionCheck {
                 return true;
             }
             return false;
+        } else {
+            if (activity.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, android.os.Process.myPid(), android.os.Process.myUid()) == PackageManager.PERMISSION_GRANTED) {
+                return true;
+            }
         }
-        return true;
+        return false;
     }
 
     private void showMessageOKCancel(String message, DialogInterface.OnClickListener listener) {

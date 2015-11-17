@@ -9,9 +9,12 @@ import android.view.Menu;
 import android.view.View;
 import android.view.MenuItem;
 
+import com.google.android.gms.maps.model.LatLng;
+
 public class Home extends AppCompatActivity {
 
     private PermissionCheck permissionCheck;
+    private IntentExtras intentExtras;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,16 +51,18 @@ public class Home extends AppCompatActivity {
     }
 
     public void friendFindMeActivity(View view) {
-        boolean permissionGranted = permissionCheck.CheckLocationPermission();
-
-        if(permissionGranted) {
+        if(permissionCheck.CheckLocationPermission()) {
             Intent intent = new Intent(this, Friend_Find_Me.class);
+
+            // todo: get devices actual coordinates
+            intent.putExtra(intentExtras.LAT_LNG, new LatLng(42.7317, -73.6925));
             startActivity(intent);
         }
     }
 
     public void meetHalfwayActivity(View view) {
-        
+        Intent intent = new Intent(this, Generate_Or_Receive.class);
+        startActivity(intent);
     }
 
     public void findMeMapActivity(View view) {
