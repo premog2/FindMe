@@ -1,0 +1,20 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/activity_vertical_margin"
+    tools:context="rcos.findme.Generate_Or_Receive">
+
+    <TextView style="@style/header"
+        android:text="@string/meetHalfwayDescription" />
+
+    <Button style="@style/button"
+        android:text="Generate"
+        android:textSize="20sp"/>
+
+    <Button style="@style/button"
+        android:text="Receive"
+        android:textSize="20sp"/>
+
+</LinearLayout>
