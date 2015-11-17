@@ -2,6 +2,7 @@ package rcos.findme;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.LocationListener;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,6 +11,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 
 public class Find_My_Friend extends AppCompatActivity {
@@ -18,15 +21,21 @@ public class Find_My_Friend extends AppCompatActivity {
     private final String CODE_NOT_LONG_ENOUGH_ERROR = "Code must be 7 characters in length.";
     private final String CODE_INCORRECT_ERROR = "This code does not match any code available. Please try again.";
 
-    private PermissionCheck permissionCheck;
-
-    public final static String LAT_LNG = "rcos.findme.coordinates";
-    public final static String PERMISSION = "rcos.findme.permission";
+    private LocationService locationService;
+    private IntentExtras intentExtras;
+    private boolean halfway = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        permissionCheck = new PermissionCheck(this);
+        Intent intent = getIntent();
+
+        if (intent.hasExtra(intentExtras.HALFWAY)) {
+            halfway = intent.getBooleanExtra(intentExtras.HALFWAY, false);
+        }
+
+        locationService = new LocationService(this);
+
         setContentView(R.layout.activity_find_my_friend);
     }
 
@@ -74,13 +83,12 @@ public class Find_My_Friend extends AppCompatActivity {
     }
 
     public void findMeMapActivity(View view) {
-        if(permissionCheck.CheckLocationPermission() && this.checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-
+        if(view != null) {
             Intent intent = new Intent(this, Find_Me_Map.class);
 
             // default to Troy coordinates
-            intent.putExtra(LAT_LNG, new LatLng(42.7317, -73.6925));
-            intent.putExtra(PERMISSION, true);
+            intent.putExtra(intentExtras.LAT_LNG, new LatLng(42.7317, -73.6925));
+            intent.putExtra(intentExtras.HALFWAY, halfway);
             finish();
             startActivity(intent);
         }

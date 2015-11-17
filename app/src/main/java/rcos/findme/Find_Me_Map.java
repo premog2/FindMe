@@ -21,20 +21,24 @@ public class Find_Me_Map extends AppCompatActivity implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
+
     public static final String TAG = Find_Me_Map.class.getSimpleName();
 
+    private PermissionCheck permissionCheck;
+    private IntentExtras intentExtras;
     private GoogleApiClient mGoogleApiClient;
     private GoogleMap map; // Might be null if Google Play services APK is not available.
     private LatLng latlng;
-    private boolean locationPermission;
+    private boolean halfway;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
 
-        latlng = intent.getParcelableExtra(Find_My_Friend.LAT_LNG);
-        locationPermission = intent.getBooleanExtra(Find_My_Friend.PERMISSION, false); // shouldn't ever come through as false
+        permissionCheck = new PermissionCheck(this);
+        latlng = intent.getParcelableExtra(intentExtras.LAT_LNG);
+        halfway = intent.getBooleanExtra(intentExtras.HALFWAY, false);
 
         setContentView(R.layout.activity_find_me_map);
         setUpMapIfNeeded();
