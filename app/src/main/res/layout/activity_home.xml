@@ -7,8 +7,9 @@
     tools:context=".Home">
 
     <TextView
+        android:id="@+id/welcomeToFindMeText"
         style="@style/header"
-        android:textSize="30dp"
+        android:textSize="25dp"
         android:text="@string/welcome" />
 
     <Button

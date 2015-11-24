@@ -17,18 +17,12 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class Find_Me_Map extends AppCompatActivity implements
-        GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener,
-        LocationListener {
+public class Find_Me_Map extends AppCompatActivity implements LocationUpdateCallback {
 
     public static final String TAG = Find_Me_Map.class.getSimpleName();
 
-    private PermissionCheck permissionCheck;
     private IntentExtras intentExtras;
-    private GoogleApiClient mGoogleApiClient;
-    private GoogleMap map; // Might be null if Google Play services APK is not available.
-    private LatLng latlng;
+    private GoogleMap map;
     private boolean halfway;
 
     @Override
@@ -36,32 +30,25 @@ public class Find_Me_Map extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
 
-        permissionCheck = new PermissionCheck(this);
-        latlng = intent.getParcelableExtra(intentExtras.LAT_LNG);
         halfway = intent.getBooleanExtra(intentExtras.HALFWAY, false);
 
         setContentView(R.layout.activity_find_me_map);
         setUpMapIfNeeded();
-
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         setUpMapIfNeeded();
-        mGoogleApiClient.connect();
     }
     @Override
     protected void onPause() {
         super.onPause();
-        if (mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.disconnect();
-        }
+    }
+
+    @Override
+    public void locationUpdated(Location location) {
+
     }
 
     /**
@@ -101,53 +88,9 @@ public class Find_Me_Map extends AppCompatActivity implements
     private void setUpMap() {
 
         // Adds a marker to location and moves the camera to the position
-        map.addMarker(new MarkerOptions().position(latlng).title("Troy"));
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, 10));
+
+        map.addMarker(new MarkerOptions().position(new LatLng(42.7317, -73.6925)).title("Troy"));
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(42.7317, -73.6925), 10));
         //map.animateCamera(CameraUpdateFactory.newLatLngZoom(latlng, map.getMaxZoomLevel()), 2000, null);
-    }
-
-    @Override
-    public void onConnected(Bundle bundle) {
-        Log.i(TAG, "Location services connected.");
-        Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        if (location == null) {
-            // Blank for a moment...
-        }
-        else {
-            handleNewLocation(location);
-        }
-    }
-    private void handleNewLocation(Location location) {
-        Log.d(TAG, location.toString());
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-        Log.i(TAG, "Location services suspended. Please reconnect.");
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
     }
 }

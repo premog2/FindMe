@@ -2,6 +2,7 @@ package rcos.findme;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.location.LocationListener;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,7 +16,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 
-public class Find_My_Friend extends AppCompatActivity {
+public class Find_My_Friend extends AppCompatActivity implements LocationUpdateCallback {
     private final String TAG = "Find_My_Friend";
     private final int CODE_SIZE = 7;
     private final String CODE_NOT_LONG_ENOUGH_ERROR = "Code must be 7 characters in length.";
@@ -34,7 +35,7 @@ public class Find_My_Friend extends AppCompatActivity {
             halfway = intent.getBooleanExtra(intentExtras.HALFWAY, false);
         }
 
-        locationService = new LocationService(this);
+        locationService = new LocationService(this, this);
 
         setContentView(R.layout.activity_find_my_friend);
     }
@@ -59,6 +60,11 @@ public class Find_My_Friend extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void locationUpdated(Location location) {
+
     }
 
     public void checkCode(View view) {
