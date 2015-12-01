@@ -3,34 +3,56 @@ package rcos.findme;
 import android.content.Intent;
 import android.graphics.Camera;
 import android.location.Location;
-import android.location.LocationListener;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class Find_Me_Map extends AppCompatActivity implements LocationUpdateCallback {
 
     public static final String TAG = Find_Me_Map.class.getSimpleName();
 
-    private IntentExtras intentExtras;
     private GoogleMap map;
+    private LocationService locationService;
     private boolean halfway;
+
+    private Location location;
+    private LatLng latlng;
+
+    private Location friendLocation;
+    private LatLng friendLatLng;
+
+    private Marker userMarker;
+    private Marker friendMarker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
 
-        halfway = intent.getBooleanExtra(intentExtras.HALFWAY, false);
+        locationService = new LocationService(this, this);
+
+        if(intent.hasExtra(IntentExtras.LOCATION)) {
+            location = intent.getParcelableExtra(IntentExtras.LOCATION);
+        }
+        if (location != null) {
+            latlng = new LatLng(location.getLatitude(), location.getLongitude());
+        }
+
+        friendLocation = intent.getParcelableExtra(IntentExtras.FRIEND_LOCATION);
+        if (friendLocation != null) {
+            friendLatLng = new LatLng(friendLocation.getLatitude(), friendLocation.getLongitude());
+        }
+
+        halfway = intent.getBooleanExtra(IntentExtras.HALFWAY, false);
 
         setContentView(R.layout.activity_find_me_map);
         setUpMapIfNeeded();
@@ -47,8 +69,19 @@ public class Find_Me_Map extends AppCompatActivity implements LocationUpdateCall
     }
 
     @Override
-    public void locationUpdated(Location location) {
+    public void locationUpdated(Location loc) {
+        location = loc;
+        latlng = new LatLng(loc.getLatitude(), loc.getLongitude());
+        userMarker.setPosition(latlng);
+        Log.i("LocationUpdated", "changed marker position");
+    }
 
+    private void addMarkersToMap() {
+        map.clear();
+        userMarker = map.addMarker(new MarkerOptions().position(latlng));
+        Log.i("AddMarkers", "added user marker");
+        friendMarker = map.addMarker(new MarkerOptions().position(friendLatLng).title("Friend's Position"));
+        Log.i("AddMarkers", "added friend marker");
     }
 
     /**
@@ -86,11 +119,12 @@ public class Find_Me_Map extends AppCompatActivity implements LocationUpdateCall
      * This should only be called once and when we are sure that {@link #map} is not null.
      */
     private void setUpMap() {
+        map.getUiSettings().setMapToolbarEnabled(false);
+        addMarkersToMap();
 
-        // Adds a marker to location and moves the camera to the position
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, 12));
 
-        map.addMarker(new MarkerOptions().position(new LatLng(42.7317, -73.6925)).title("Troy"));
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(42.7317, -73.6925), 10));
+
         //map.animateCamera(CameraUpdateFactory.newLatLngZoom(latlng, map.getMaxZoomLevel()), 2000, null);
     }
 }

@@ -24,6 +24,7 @@
 
     <Button
         style="@style/button"
-        android:text="@string/meetHalfwayButtonText" />
+        android:text="@string/meetHalfwayButtonText"
+        android:onClick="meetHalfwayActivity" />
 
 </LinearLayout>

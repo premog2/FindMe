@@ -14,7 +14,8 @@ import com.google.android.gms.maps.model.LatLng;
 
 public class Home extends AppCompatActivity implements LocationUpdateCallback {
 
-    private LocationService locationService;
+    protected LocationService locationService;
+    private Location location;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +54,9 @@ public class Home extends AppCompatActivity implements LocationUpdateCallback {
             if (locationService.isGoogleApiClientConnected() && !locationService.isRequestingLocationUpdates()) {
                 locationService.startLocationUpdates();
             } else if (!locationService.isGoogleApiClientConnected()) {
+                locationService.setRequestingLocationUpdates(true);
                 locationService.attemptConnection();
+                locationService.attemptGpsConnection();
             }
         }
     }
@@ -61,6 +64,26 @@ public class Home extends AppCompatActivity implements LocationUpdateCallback {
     @Override
     protected void onPause() {
         super.onPause();
+        Log.i("HOME", "Paused");
+        locationService.stopLocationUpdates();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        if(locationService != null) {
+            if(!locationService.isGoogleApiClientConnected()) {
+                locationService.setRequestingLocationUpdates(true);
+                locationService.attemptConnection();
+                locationService.attemptGpsConnection();
+            }
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.i("HOME", "Stopped");
         locationService.disconnect();
     }
 
@@ -73,20 +96,8 @@ public class Home extends AppCompatActivity implements LocationUpdateCallback {
     }
 
     @Override
-    public void locationUpdated(Location location) {
-        String update = "";
-        double lat = location.getLatitude();
-        double lng = location.getLongitude();
-
-        String lats = Double.toString((lat));
-        String lngs = Double.toString((lng));
-
-        update = update + lats + ", " + lngs;
-
-        Log.i("Update String", update);
-
-        TextView t = (TextView)findViewById(R.id.welcomeToFindMeText);
-        t.setText(update);
+    public void locationUpdated(Location loc) {
+        location = loc;
     }
 
     private void updateValuesFromBundle(Bundle savedInstanceState) {
@@ -122,25 +133,49 @@ public class Home extends AppCompatActivity implements LocationUpdateCallback {
     }
 
     public void findMyFriendActivity(View view) {
-        Intent intent = new Intent(this, Find_My_Friend.class);
-        startActivity(intent);
+        if(locationService.isGoogleApiClientConnected() && locationService.isRequestingLocationUpdates()) {
+            locationService.attemptGpsConnection();
+        }
+        if(locationService.providerEnabled()) {
+            Intent intent = new Intent(this, Find_My_Friend.class);
+
+            if(location != null) {
+                intent.putExtra(IntentExtras.LOCATION, location);
+            }
+
+            startActivity(intent);
+        }
     }
 
     public void friendFindMeActivity(View view) {
+        if(locationService.isGoogleApiClientConnected() && locationService.isRequestingLocationUpdates()) {
+            locationService.attemptGpsConnection();
+        }
+        if(locationService.providerEnabled()) {
             Intent intent = new Intent(this, Friend_Find_Me.class);
 
-            // todo: get device coordinates and send to backend successfully before starting activity
-            intent.putExtra(IntentExtras.LAT_LNG, new LatLng(42.7317, -73.6925));
+
+            if(location != null) {
+                intent.putExtra(IntentExtras.LOCATION, location);
+            }
+
             startActivity(intent);
+        }
     }
 
     public void meetHalfwayActivity(View view) {
-        Intent intent = new Intent(this, Generate_Or_Receive.class);
-        startActivity(intent);
-    }
+        if(locationService.isGoogleApiClientConnected() && locationService.isRequestingLocationUpdates()) {
+            locationService.attemptGpsConnection();
+        }
+        if(locationService.providerEnabled()) {
+            Intent intent = new Intent(this, Generate_Or_Receive.class);
 
-    public void findMeMapActivity(View view) {
-        Intent intent = new Intent(this, Find_Me_Map.class);
-        startActivity(intent);
+
+            if(location != null) {
+                intent.putExtra(IntentExtras.LOCATION, location);
+            }
+
+            startActivity(intent);
+        }
     }
 }

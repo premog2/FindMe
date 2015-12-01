@@ -48,7 +48,6 @@ public class Generate_Or_Receive extends AppCompatActivity {
             Intent intent = new Intent(this, Friend_Find_Me.class);
 
             // todo: get devices actual coordinates
-            intent.putExtra(intentExtras.LAT_LNG, new LatLng(42.7317, -73.6925));
             intent.putExtra(intentExtras.HALFWAY, true);
             finish();
             startActivity(intent);

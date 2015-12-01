@@ -17,13 +17,14 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 
 public class Find_My_Friend extends AppCompatActivity implements LocationUpdateCallback {
-    private final String TAG = "Find_My_Friend";
     private final int CODE_SIZE = 7;
     private final String CODE_NOT_LONG_ENOUGH_ERROR = "Code must be 7 characters in length.";
     private final String CODE_INCORRECT_ERROR = "This code does not match any code available. Please try again.";
 
     private LocationService locationService;
-    private IntentExtras intentExtras;
+
+    private Location location;
+    private Location friendLocation;
     private boolean halfway = false;
 
     @Override
@@ -31,8 +32,12 @@ public class Find_My_Friend extends AppCompatActivity implements LocationUpdateC
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
 
-        if (intent.hasExtra(intentExtras.HALFWAY)) {
-            halfway = intent.getBooleanExtra(intentExtras.HALFWAY, false);
+        if (intent.hasExtra(IntentExtras.HALFWAY)) {
+            halfway = intent.getBooleanExtra(IntentExtras.HALFWAY, false);
+        }
+
+        if (intent.hasExtra(IntentExtras.LOCATION)) {
+            location = intent.getParcelableExtra(IntentExtras.LOCATION);
         }
 
         locationService = new LocationService(this, this);
@@ -63,8 +68,17 @@ public class Find_My_Friend extends AppCompatActivity implements LocationUpdateC
     }
 
     @Override
-    public void locationUpdated(Location location) {
+    public void locationUpdated(Location loc) {
+        Log.i("Find_My_Friend", "updated location");
+        location = loc;
+    }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.i("Find_My_Friend", "Stopped and finished");
+        locationService.disconnect();
+        finish();
     }
 
     public void checkCode(View view) {
@@ -89,17 +103,14 @@ public class Find_My_Friend extends AppCompatActivity implements LocationUpdateC
     }
 
     public void findMeMapActivity(View view) {
-        if(view != null) {
-            Intent intent = new Intent(this, Find_Me_Map.class);
+        Intent intent = new Intent(this, Find_Me_Map.class);
+        friendLocation = location;
+        friendLocation.setLongitude(-73.6925);
+        friendLocation.setLatitude(42.7317);
 
-            // default to Troy coordinates
-            intent.putExtra(intentExtras.LAT_LNG, new LatLng(42.7317, -73.6925));
-            intent.putExtra(intentExtras.HALFWAY, halfway);
-            finish();
-            startActivity(intent);
-        }
-         else {
-            finish();
-        }
+        intent.putExtra(IntentExtras.LOCATION, location);
+        intent.putExtra(IntentExtras.FRIEND_LOCATION, friendLocation);
+        intent.putExtra(IntentExtras.HALFWAY, halfway);
+        startActivity(intent);
     }
 }
