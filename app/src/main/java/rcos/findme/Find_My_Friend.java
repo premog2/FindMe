@@ -17,6 +17,8 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 
 public class Find_My_Friend extends AppCompatActivity implements LocationUpdateCallback {
+    private final static String TAG = "Find_My_Friend";
+
     private final int CODE_SIZE = 7;
     private final String CODE_NOT_LONG_ENOUGH_ERROR = "Code must be 7 characters in length.";
     private final String CODE_INCORRECT_ERROR = "This code does not match any code available. Please try again.";
@@ -76,9 +78,25 @@ public class Find_My_Friend extends AppCompatActivity implements LocationUpdateC
     @Override
     public void onStop() {
         super.onStop();
-        Log.i("Find_My_Friend", "Stopped and finished");
+        Log.i(TAG, "Stopped and finished");
         locationService.disconnect();
         finish();
+    }
+
+    // onPause and onResume shouldn't need to ever be called in this activity,
+    // but I added them in the event that they do unexpectedly, so we can make sure
+    // they don't get called again.
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.i(TAG, "Paused, stopping location updates");
+        locationService.stopLocationUpdates();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.i(TAG, "Resumed, reactivating location updates");
     }
 
     public void checkCode(View view) {

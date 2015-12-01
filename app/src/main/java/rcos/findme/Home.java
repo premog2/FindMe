@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.google.android.gms.maps.model.LatLng;
 
 public class Home extends AppCompatActivity implements LocationUpdateCallback {
+    private final static String TAG = "Home";
 
     protected LocationService locationService;
     private Location location;
@@ -64,7 +65,7 @@ public class Home extends AppCompatActivity implements LocationUpdateCallback {
     @Override
     protected void onPause() {
         super.onPause();
-        Log.i("HOME", "Paused");
+        Log.i(TAG, "Paused, stopping location updates");
         locationService.stopLocationUpdates();
     }
 
