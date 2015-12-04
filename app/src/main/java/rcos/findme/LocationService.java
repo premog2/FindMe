@@ -111,7 +111,8 @@ public class LocationService implements GoogleApiClient.ConnectionCallbacks, Goo
     }
 
     protected void stopLocationUpdates() {
-        LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
+        if (googleApiClient.isConnected())
+            LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
         setRequestingLocationUpdates(false);
     }
 
@@ -140,6 +141,8 @@ public class LocationService implements GoogleApiClient.ConnectionCallbacks, Goo
     private boolean betterLocation(Location location) {
         if (currentLocation == null) {
             return true;
+        } else if (location == null) {
+            return false;
         }
         long currentTime = location.getTime();
         long locationTime = currentLocation.getTime();

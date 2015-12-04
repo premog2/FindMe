@@ -1,7 +1,16 @@
 package rcos.findme;
 
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Camera;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -11,12 +20,19 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
+import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class Find_Me_Map extends AppCompatActivity implements LocationUpdateCallback {
+import java.util.List;
+
+public class Find_Me_Map extends AppCompatActivity implements LocationUpdateCallback, SensorEventListener {
 
     public static final String TAG = Find_Me_Map.class.getSimpleName();
 
@@ -26,6 +42,14 @@ public class Find_Me_Map extends AppCompatActivity implements LocationUpdateCall
 
     private Location location;
     private LatLng latlng;
+    private float accuracy;
+    private Circle accCircle;
+
+    private SensorManager mSensorManager;
+    private Sensor mSensor;
+    private Sensor aSensor;
+    private float heading;
+    private final int SENSOR_DELAY = 100000000; // Time in microseconds between sensor updates
 
     private Location friendLocation;
     private LatLng friendLatLng;
@@ -45,6 +69,7 @@ public class Find_Me_Map extends AppCompatActivity implements LocationUpdateCall
         }
         if (location != null) {
             latlng = new LatLng(location.getLatitude(), location.getLongitude());
+            accuracy = location.getAccuracy();
         }
 
         friendLocation = intent.getParcelableExtra(IntentExtras.FRIEND_LOCATION);
@@ -54,6 +79,10 @@ public class Find_Me_Map extends AppCompatActivity implements LocationUpdateCall
 
         halfway = intent.getBooleanExtra(IntentExtras.HALFWAY, false);
 
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+        aSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
         setContentView(R.layout.activity_find_me_map);
         setUpMapIfNeeded();
     }
@@ -62,10 +91,18 @@ public class Find_Me_Map extends AppCompatActivity implements LocationUpdateCall
     protected void onResume() {
         super.onResume();
         setUpMapIfNeeded();
+        if (!mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL)) {
+            Log.i("Sensor update", "Error registering magnetic field sensor");
+        }
+        if (!mSensorManager.registerListener(this, aSensor, SensorManager.SENSOR_DELAY_NORMAL)) {
+            Log.i("Sensor update", "Error registering acceleromoter sensor");
+        }
     }
+
     @Override
     protected void onPause() {
         super.onPause();
+        mSensorManager.unregisterListener(this);
     }
 
     @Override
@@ -73,15 +110,111 @@ public class Find_Me_Map extends AppCompatActivity implements LocationUpdateCall
         location = loc;
         latlng = new LatLng(loc.getLatitude(), loc.getLongitude());
         userMarker.setPosition(latlng);
+        if (accuracy != 0) {
+            accCircle.setCenter(latlng);
+            accCircle.setRadius(loc.getAccuracy());
+        }
         Log.i("LocationUpdated", "changed marker position");
     }
 
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        //unused
+    }
+
+    private float [] m;
+    private float [] a;
+    private int average = 0;
+    private int sensorChanges = -1;
+    private final int SENSOR_READINGS_PER_AVERAGE = 50;
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            a = event.values.clone();
+        }
+        if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD &&
+                userMarker != null && a != null) {
+
+            m = event.values.clone();
+            float [] R = new float[9];
+            float [] I = new float[9];
+            if (SensorManager.getRotationMatrix(R, I, a, m)) {
+                float orientation[] = new float[3];
+                SensorManager.getOrientation(R, orientation);
+                heading = orientation[0] * 57.2958f;
+                if (heading < 0) {
+                    heading = 360 + heading;
+                }
+
+                average  += heading;
+                if (sensorChanges == -1) {
+                    sensorChanges = 1;
+                    userMarker.setRotation(heading);
+                } else if (sensorChanges < SENSOR_READINGS_PER_AVERAGE - 1) {
+                    sensorChanges++;
+                } else {
+                    sensorChanges = 0;
+                    average = average / SENSOR_READINGS_PER_AVERAGE;
+
+                    userMarker.setRotation(average);
+                    average = 0;
+                    Log.i("Sensor update", "Updated heading and rotation to: " + heading);
+                }
+
+            }  else {
+                Log.i("Sensor update", "Error getting rotation matrix");
+            }
+        }
+        if (userMarker == null){
+            Log.i("Sensor update", "Error: userMarker == null");
+        }
+        if (m == null){
+            Log.i("Sensor update", "Error: m == null");
+        }
+        if (a == null){
+            Log.i("Sensor update", "Error: a == null");
+        }
+        //Log.i("SensorEvent", "geomagnetic sensor changed to: " + event.values[0]);
+    }
+
     private void addMarkersToMap() {
+        //resize bitmaps
+        Bitmap userBitmap;
+        userBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.usermarker);
+
+        userBitmap = Bitmap.createScaledBitmap(userBitmap,
+                Math.round(userBitmap.getWidth()/1.8f),
+                Math.round(userBitmap.getHeight()/1.8f), false);
+
+        Bitmap friendBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.friendmarker);
+        friendBitmap = Bitmap.createScaledBitmap(friendBitmap,
+                Math.round(friendBitmap.getWidth()/4.3f),
+                Math.round(friendBitmap.getHeight()/4.3f), false);
+
+        //Clear map and add markers
         map.clear();
-        userMarker = map.addMarker(new MarkerOptions().position(latlng));
+        userMarker = map.addMarker(new MarkerOptions()
+                .position(latlng)
+                .icon(BitmapDescriptorFactory.fromBitmap(userBitmap))
+                .anchor(0.5f, 0.5f)
+                .flat(true));
         Log.i("AddMarkers", "added user marker");
-        friendMarker = map.addMarker(new MarkerOptions().position(friendLatLng).title("Friend's Position"));
+        friendMarker = map.addMarker(new MarkerOptions()
+                .position(friendLatLng)
+                .title("Friend's Position")
+                .icon(BitmapDescriptorFactory.fromBitmap(friendBitmap)));
         Log.i("AddMarkers", "added friend marker");
+
+        if (accuracy != 0) {
+            //Add location accuracy circle
+            CircleOptions accCircleOptions = new CircleOptions()
+                    .center(latlng)
+                    .radius(accuracy)
+                    .strokeColor(Color.argb(100, 255, 255, 255))
+                    .fillColor(Color.argb(75, 33, 150, 243));
+            accCircle = map.addCircle(accCircleOptions);
+        }
+
     }
 
     /**
